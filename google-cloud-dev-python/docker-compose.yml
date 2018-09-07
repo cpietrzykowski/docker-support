@@ -1,0 +1,26 @@
+version: '3'
+services:
+  app:
+    build: .
+
+    ports:
+      - ${ADMIN_PORT}:${ADMIN_PORT}
+      - ${API_PORT}:${API_PORT}
+      - ${APP_PORT}:${APP_PORT}
+
+    volumes:
+      - ${APP_ROOT}:/app
+
+    command:
+      [
+        'dev_appserver.py',
+        '--admin_host=0.0.0.0',
+        '--host=0.0.0.0',
+        '--api_host=0.0.0.0',
+        '--api_port=${API_PORT}',
+        '--enable_console=true',
+        '--use_mtime_file_watcher=${USE_MTIME_FILE_WATCH:-false}',
+        '--enable_host_checking=false',
+        '--storage_path=/tmp/.appstorage',
+        '/app/app.yaml',
+      ]
