@@ -1,3 +1,5 @@
 # Docker Support
 
-> DANGER: None of these are intended for production unless *explicitly* indicated.
+devops is not fun, but neither is lack of adequate supports :D
+
+> DANGER: covering my ass -- these are intended for development only
