@@ -1,17 +1,19 @@
-FROM alpine
+FROM debian:latest
 
-ARG LIBRESSL_VERSION="2.8.0"
+ARG LIBRESSL_VERSION="2.9.2"
 
 ARG BUILD_DEPS="\
-    build-base \
-    gnupg \
-    linux-headers \
+    build-essential \
+    ca-certificates \
+    gnupg2 \
+    wget \
 "
 
 RUN set -ex \
     && WORK_DIR="$(mktemp -d)" \
     && cd "$WORK_DIR" \
-    && apk add --no-cache --virtual .deps $BUILD_DEPS \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends $BUILD_DEPS \
     && wget --output-document=libressl.tar.gz "https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${LIBRESSL_VERSION}.tar.gz" \
     && wget --output-document=libressl.tar.gz.asc "https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${LIBRESSL_VERSION}.tar.gz.asc" \
     && wget --output-document=libressl.asc "https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl.asc" \
@@ -24,8 +26,8 @@ RUN set -ex \
     && ./configure \
     && make check \
     && make install \
-    && apk del .deps \
     && cd / \
+    && apt-get purge -y --auto-remove $BUILD_DEPS \
     && rm -rf "$WORK_DIR"
 
 ENTRYPOINT [ "openssl" ]

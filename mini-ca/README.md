@@ -13,7 +13,9 @@ A minimal CA [libressl](https://www.libressl.org/) based docker container.
 
 Assuming you have built the image locally with the tag 'libressl'.
 
-- `docker run --rm -it libressl ca.sh [devdomain]`
-    - generate key, csr and sign certificate with root CA for [devdomain]
-- `docker run --rm -it libressl openssl`
+> docker build --tag mini-ca .
+
+- `docker run --rm -it -v ${PWD}/out:/root/ca/out --entrypoint ca.sh mini-ca`
+    - generate key, csr and sign certificate with root CA
+- `docker run --rm -it mini-ca`
     - invoke a typical openssl session

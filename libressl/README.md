@@ -1,7 +1,7 @@
 # LibreSSL
 
-A container for [libressl](https://www.libressl.org/), using alpine as its base.
-Useful as a base image for other tools.
+A container for [libressl](https://www.libressl.org/).
+Useful as a base image for other tools that depend on an OpenSSL-like install.
 
 ### building
 
