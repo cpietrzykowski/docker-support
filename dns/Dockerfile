@@ -2,28 +2,28 @@ FROM libressl
 
 ARG UNBOUND_SOURCE_URL="https://nlnetlabs.nl/downloads/unbound/unbound-latest.tar.gz"
 ARG BUILD_DEPS="\
-    build-base \
-    expat-dev \
+    build-essential \
+    ca-certificates \
+    libexpat1-dev \
+    wget \
 "
 
 RUN set -eux \
-    && apk add --no-cache bind-tools
-
-RUN set -eux \
     && WORK_DIR="$(mktemp -d)" \
-    && mkdir -p "$WORK_DIR/unbound" \
-    && cd "$WORK_DIR" \
+    && cd "${WORK_DIR}" \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends ${BUILD_DEPS} \
     && wget --output-document=unbound.tar.gz "https://nlnetlabs.nl/downloads/unbound/unbound-latest.tar.gz" \
-    && tar --extract --gzip --directory="$WORK_DIR/unbound" --strip-components=1 --file=unbound.tar.gz \
-    && cd "$WORK_DIR/unbound" \
-    && apk add --no-cache --virtual .deps $BUILD_DEPS \
+    && mkdir -p "unbound" \
+    && tar --extract --gzip --directory="unbound" --strip-components=1 --file=unbound.tar.gz \
+    && cd "unbound" \
     && ./configure \
     && make install \
     && cd / \
-    && rm -fr "$WORK_DIR" \
-    && apk del .deps \
-    && addgroup -S unbound \
-    && adduser -S unbound -G unbound \
+    && rm -fr "${WORK_DIR}" \
+    && apt-get purge -y --auto-remove ${BUILD_DEPS} \
+    && groupadd --system unbound \
+    && useradd --shell /dev/null --system -g unbound unbound \
     && command -v unbound
 
 EXPOSE 53/TCP

@@ -1,14 +1,18 @@
 # LibreSSL
 
 A container for [libressl](https://www.libressl.org/).
-Useful as a base image for other tools that depend on an OpenSSL-like install.
+Useful as a base image for other tools that depend on an OpenSSL-like install being available.
 
-### building
+### Building
 
-> $ docker build --tag libressl .
+```
+$ docker build --tag libressl .
+```
 
-### running
+### Usage
 
 The entrypoint is `openssl`.
 
-> $ docker run libressl version
+```
+$ docker run libressl version
+```

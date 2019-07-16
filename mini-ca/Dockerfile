@@ -6,3 +6,5 @@ VOLUME ["/root/ca/out"]
 
 ENV PATH /root/ca/support/bin:$PATH
 COPY "support" "/root/ca/support"
+
+ENTRYPOINT [ "ca.sh" ]

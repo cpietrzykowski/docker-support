@@ -14,4 +14,4 @@ $ docker-compose up
   to your command
 
 - doubt this is required for a dev env
-    - $ unbound-control-setup
+    - `$ unbound-control-setup`
