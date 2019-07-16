@@ -5,22 +5,25 @@ upstream app {
 server {
     listen 80;
     server_name ${SERVER_NAME};
-    return 301 https://$server_name$request_uri;
+
+    location / {
+        return 301 https://$server_name$request_uri;
+    }
+
+    location = /root.crt {
+        alias /etc/nginx/ssl/ca/root.crt;
+    }
 }
 
 server {
     listen 443 ssl default_server;
     server_name ${SERVER_NAME};
-
+    
     ssl_certificate /etc/nginx/ssl/server.crt;
     ssl_certificate_key /etc/nginx/ssl/server.key;
-
+    
     location / {
-        proxy_pass http://app;
         proxy_set_header Host $host;
-    }
-
-    location = /ca.pem {
-        alias /etc/nginx/ssl/ca.pem;
+        proxy_pass http://app;
     }
 }

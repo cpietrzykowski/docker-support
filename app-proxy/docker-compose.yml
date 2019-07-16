@@ -1,24 +1,24 @@
-version: "3"
+version: '3'
 services:
   app-proxy:
     image: nginx:alpine
 
     volumes:
-    - ./ext:/etc/nginx/conf.d/ext
-    - ${SSL_SUPPORT_DIR?ssl support dir not set}:/etc/nginx/ssl
+      - ./ext:/etc/nginx/conf.d/ext
+      - ${SSL_SUPPORT_DIR?ssl support dir not set}:/etc/nginx/ssl
 
     ports:
-    - "80:80"
-    - "443:443"
+      - '80:80'
+      - '443:443'
 
     environment:
       - APP_HOST=host.docker.internal
       - APP_PORT=${APP_PORT:-3000}
       - SERVER_NAME=${SERVER_NAME?server name not set}
-      
+
     command:
       [
-        "/bin/sh",
-        "-c",
-        "envsubst '$${APP_HOST}:$${APP_PORT}:$${SERVER_NAME}' < /etc/nginx/conf.d/ext/default.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
+        '/bin/sh',
+        '-c',
+        "envsubst '$${APP_HOST}:$${APP_PORT}:$${SERVER_NAME}' < /etc/nginx/conf.d/ext/default.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'",
       ]

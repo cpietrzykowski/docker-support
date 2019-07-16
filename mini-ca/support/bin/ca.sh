@@ -10,24 +10,24 @@ init_ca() {
     # prepare ca
     mkdir -p "${3}/out" \
     && cd "${3}/out" \
-    && mkdir -p certs db private \
+    && mkdir -p crl certs db ca \
     && touch db/index \
     && "${1}" rand -hex 16 > db/serial \
     && echo 1001 > db/crlnumber \
     && "${1}" req \
         -config "${CA_CONF}" \
-        -extensions ca_ext \
-        -keyout "private/${2}.key" \
-        -x509 -new -days 3650 -nodes -out "${2}.crt" \
+        -keyout "ca/${2}.key" \
+        -x509 -new -days 3650 -nodes -out "ca/${2}.crt" \
+    && "${1}" x509 -in "ca/${2}.crt" -text \
     && "${1}" ca -gencrl \
         -config "${4}" \
-        -out "$crl/{2}.crl"
+        -out "crl/${2}.crl"
 }
 
-if [ ! -d "${CA_ROOT}/${CA_NAME}.crt" ] ; then 
-    init_ca "${SSL_CMD}" "${CA_NAME}" "${CA_ROOT}" "${CA_CONF}"
-else
+if [ -f "${CA_ROOT}/ca/${CA_NAME}.crt" ] ; then 
     echo "USING EXISTING CERTIFACTE AUTHORITY"
+else
+    init_ca "${SSL_CMD}" "${CA_NAME}" "${CA_ROOT}" "${CA_CONF}"
 fi
 
 # user input
@@ -56,21 +56,22 @@ name=${DOMAIN_NAME}
 prompt              = no
 encrypt_key         = no
 distinguished_name  = dn
-req_extensions      = v3ext
+req_extensions      = req_ext
 default_bits        = 4069
 
 [dn]
 countryName         = "CA"
-organizationName    = \${name}
+organizationName    = "Development"
 commonName          = DEVELOPMENT: \${name}
 emailAddress        = support@\${name}
 
-[v3ext]
+[req_ext]
 basicConstraints    = CA:false
-keyUsage            = nonRepudiation,digitalSignature,keyEncipherment
+keyUsage            = dataEncipherment,digitalSignature,keyEncipherment,nonRepudiation
 subjectAltName      = DNS:*.\${name},DNS:\${name}.local,DNS:localhost
 END
 
+if [ -f "${DOMAIN_OUT}/server.csr" ] ; then 
 openssl req \
     -text \
     -in "${DOMAIN_OUT}/server.csr"
@@ -81,7 +82,9 @@ openssl ca \
     -out "${DOMAIN_OUT}/server.crt"
 
 openssl verify \
+    -verbose \
     -x509_strict \
     -purpose sslserver \
-    -CAfile "${CA_ROOT}/out/${CA_NAME}.crt" \
+    -CAfile "${CA_ROOT}/out/ca/${CA_NAME}.crt" \
     "${DOMAIN_OUT}/server.crt"
+fi
